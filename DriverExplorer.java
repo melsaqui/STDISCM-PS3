@@ -24,7 +24,7 @@ public class DriverExplorer extends JFrame{
     }
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
-            //client
+            //client this is not yet working
             Socket socket = new Socket();
             socket.connect(new InetSocketAddress("127.0.0.1", 5001), 1000);
             System.out.println("Connection Successful!");
