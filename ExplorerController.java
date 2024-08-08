@@ -2,7 +2,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class ExplorerController implements KeyListener {
+public class ExplorerController implements KeyListener{
     private Explorer explorer;
 
     public ExplorerController() {

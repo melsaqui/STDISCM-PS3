@@ -65,7 +65,7 @@ public class SimulationPanel extends JPanel {
 
     private void updateAndRepaint() {
         threadManager.updateParticles();
-        threadManager.updateExplorer(); // Ensure explorer is updated
+        //threadManager.updateExplorer(); // Ensure explorer is updated
         SwingUtilities.invokeLater(drawPanel::repaint);
     }
 
@@ -120,10 +120,10 @@ public class SimulationPanel extends JPanel {
 
             g.setColor(Color.WHITE);
             threadManager.drawParticles(g, canvasHeight);
-            if (threadManager.getExplorerCount() > 0) {
-                threadManager.drawExplorer(g, canvasHeight);
-                zoomToExplorer(g);
-            }
+          //  if (threadManager.getExplorerCount() > 0) {
+               // threadManager.drawExplorer(g, canvasHeight);
+               // zoomToExplorer(g);
+          //  }
 
             if (fpsToDisplay >= 60) {
                 g.setColor(Color.GREEN);
@@ -138,7 +138,7 @@ public class SimulationPanel extends JPanel {
             g.drawString(String.format("Number of Particles: %d", threadManager.getParticleCount()), 10, 40);
         }
 
-        private void zoomToExplorer(Graphics g) {
+       /*private void zoomToExplorer(Graphics g) {
             Explorer explorer = threadManager.getExplorerController().getExplorer();
             if (explorer != null) {
                 int centerX = getWidth() / 2;
@@ -147,16 +147,16 @@ public class SimulationPanel extends JPanel {
                 int explorerY = (int) explorer.getY();
                 g.translate(centerX - explorerX, centerY - explorerY);
             }
-        }
+        }*/
     }
 
-    @Override
-    public void addNotify() {
+    //@Override
+    /*public void addNotify() {
         super.addNotify();
         requestFocus();
         KeyListener explorerController = threadManager.getExplorerController();
         if (explorerController != null) {
             addKeyListener(explorerController); // Ensure the key listener is added
         }
-    }
+    }*/
 }

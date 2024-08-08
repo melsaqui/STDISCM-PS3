@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class ControlPanel extends JFrame {
         mainPanel.add(clearButtonPanel, BorderLayout.SOUTH); // Add clear button at the bottom of the main panel
     }
 
-    private void setUpExplorer(JPanel mainPanel) {
+    /*private void setUpExplorer(JPanel mainPanel) {
         JButton explorerButton = new JButton("Explorer Mode");
         explorerButton.addActionListener(e -> {
             dispose();
@@ -83,7 +84,7 @@ public class ControlPanel extends JFrame {
         JPanel explorerButtonPanel = new JPanel();
         explorerButtonPanel.add(explorerButton);
         mainPanel.add(explorerButtonPanel, BorderLayout.SOUTH); 
-    }
+    }*/
     
     private void clearFeedbackDisplay() {
         feedbackMessages.clear(); // Clear the list of messages
@@ -214,13 +215,31 @@ public class ControlPanel extends JFrame {
             int y = Integer.parseInt(yInput.getText());
             double angle = Math.toRadians(Double.parseDouble(angleInput.getText()));
             double velocity = Double.parseDouble(velocityInput.getText());
-
+            double[][]inputs = new double[number][4];
             for (int i = 0; i < number; i++) {
                 // Optional: Add a small offset to prevent overlap
                 threadManager.addParticle(new Particle(x + i, y + i, Math.cos(angle) * velocity, Math.sin(angle) * velocity));
+                inputs[i][0] = x +i;
+                inputs[i][1]= y+i;
+                inputs[i][2] =Math.cos(angle) * velocity;
+                inputs[i][3] = Math.sin(angle) * velocity;
+
             }
             String feedback = "Added " + number + " particles at (" + x + ", " + y + ") with angle " + Math.toDegrees(angle) + "° and velocity " + velocity;
             updateFeedbackDisplay(feedback);
+            //ThreadManager objectToSend=new CustomObject();
+            
+            try {
+                Socket s = new Socket("127.0.0.1", 5000);
+                ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+                out.writeObject(inputs);
+                out.flush();
+                s.close();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex);
+                System.out.print(ex);
+            }
+            
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter valid numbers for all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
         }

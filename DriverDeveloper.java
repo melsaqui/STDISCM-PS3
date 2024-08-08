@@ -17,6 +17,7 @@ public class DriverDeveloper extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         setVisible(true);
+
     }
 
     public static void main(String[] args) {
@@ -26,7 +27,7 @@ public class DriverDeveloper extends JFrame {
             ControlPanel controlPanel = new ControlPanel(driver.simulationPanel.getThreadManager(),driver.simulationPanel);
             
             // Position ControlPanel to the right of Driver window
-            controlPanel.setLocation( driver.getX()+driver.getWidth()-100, driver.getY()-100);
+            //controlPanel.setLocation( driver.getX()+driver.getWidth()-100, driver.getY()-100);
             controlPanel.setVisible(true);
         });
     }

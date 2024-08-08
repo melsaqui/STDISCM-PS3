@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.io.Serializable;
 
-public class ThreadManager implements serializable{
+
+public class ThreadManager{
     private final List<ParticleEngine> processors = new CopyOnWriteArrayList<>();
     private ExplorerEngine explorerEngine;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -25,7 +27,7 @@ public class ThreadManager implements serializable{
             addProcessor();
         }
     }
-
+    
     public void clearParticles() {
         for (ParticleEngine engine : processors) {
             engine.clearParticles();
@@ -53,9 +55,6 @@ public class ThreadManager implements serializable{
         }
     }
 
-    public int getExplorerCount() {
-        return explorerCount;
-    }
 
     private boolean shouldAddThread() {
         boolean processingTimeIncreasing = false;
@@ -77,7 +76,7 @@ public class ThreadManager implements serializable{
         roundRobinIndex = (roundRobinIndex + 1) % processors.size();
     }
 
-    public synchronized void addExplorer(Explorer explorer) {
+   public synchronized void addExplorer(Explorer explorer) {
         explorerEngine = new ExplorerEngine(canvasWidth, canvasHeight, explorer);
         explorerEngine.addExplorer(explorer);
         explorerCount++;
@@ -144,7 +143,9 @@ public class ThreadManager implements serializable{
         }
         lastAverageProcessingTime = processingTimesHistory.stream().mapToLong(Long::longValue).sum() / processingTimesHistory.size();
     }
-
+    public int getExplorerCount(){
+        return explorerCount;
+    }
     public ExplorerController getExplorerController() {
         return explorerEngine != null ? explorerEngine.getExplorerController() : null;
     }

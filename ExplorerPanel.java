@@ -3,11 +3,14 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 
 public class ExplorerPanel extends JPanel{
     private final DrawPanel drawPanel;
-    private ThreadManager threadManager;
+    private final ThreadManager threadManager;
     private Thread gameThread;
     private volatile boolean running = false;
     private FPSCounter fpsTracker = new FPSCounter();
@@ -17,7 +20,7 @@ public class ExplorerPanel extends JPanel{
         setLayout(new BorderLayout());
         add(drawPanel, BorderLayout.CENTER);
         this.threadManager=threadManager;
-        //threadManager = new ThreadManager();
+        threadManager.addExplorer(new Explorer(400, 100));
 
         drawPanel.addComponentListener(new ComponentAdapter() {
             @Override
@@ -28,15 +31,13 @@ public class ExplorerPanel extends JPanel{
             }
         });
     }
-    public ExplorerPanel(){}
-
-    public void setThreadManager(ThreadManager threadManager){
+    public ExplorerPanel() {
         drawPanel = new DrawPanel();
         setLayout(new BorderLayout());
         add(drawPanel, BorderLayout.CENTER);
-        this.threadManager=threadManager;
-        //threadManager = new ThreadManager();
-
+        //this.threadManager=threadManager;
+        this.threadManager = new ThreadManager();
+        threadManager.addExplorer(new Explorer(400, 100));
         drawPanel.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -52,8 +53,24 @@ public class ExplorerPanel extends JPanel{
         gameThread = new Thread(this::gameLoop);
         gameThread.start();
     }
+    private void listen_dev(){
+        try {
+        ServerSocket server = new ServerSocket(5000);
+        Socket s = server.accept();
+        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+        double[][] from_dev= (double[][])in.readObject();
+        for(int i =0;i<from_dev.length;i++){
+            threadManager.addParticle(new Particle((int)from_dev[i][0],(int)from_dev[i][1],from_dev[i][2],from_dev[i][3]));
 
+        }
+            //ThreadManager threadManager = new ThreadManager();
+            
+       } catch (Exception e) {
+            System.out.println(e);
+       }
+    }
     private void gameLoop() {
+        listen_dev();
         final long targetDelay = 1000 / 60; 
         long lastFpsDisplayTime = System.currentTimeMillis(); 
 
@@ -131,6 +148,16 @@ public class ExplorerPanel extends JPanel{
             setBackground(Color.GRAY);
         }
 
+        private void zoomToExplorer(Graphics g) {
+            Explorer explorer = threadManager.getExplorerController().getExplorer();
+            if (explorer != null) {
+                int centerX = getWidth() / 2;
+                int centerY = getHeight() / 2;
+                int explorerX = (int) explorer.getX();
+                int explorerY = (int) explorer.getY();
+                g.translate(centerX - explorerX, centerY - explorerY);
+            }
+        }
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -141,7 +168,7 @@ public class ExplorerPanel extends JPanel{
             if (threadManager.getExplorerCount()>0){
              //   threadManager.drawParticles(g, canvasHeight);
                 threadManager.drawExplorer(g, canvasHeight);
-                zoomToExplorer(g);
+                 zoomToExplorer(g);
             }
             if (fpsToDisplay >= 60){
                 g.setColor(Color.GREEN);
@@ -155,16 +182,7 @@ public class ExplorerPanel extends JPanel{
             g.setColor(Color.BLUE);
             g.drawString(String.format("Number of Particles: %d", threadManager.getParticleCount()), 100, 20);
         }
-        private void zoomToExplorer(Graphics g) {
-            Explorer explorer = threadManager.getExplorerController().getExplorer();
-            if (explorer != null) {
-                int centerX = getWidth() / 2;
-                int centerY = getHeight() / 2;
-                int explorerX = (int) explorer.getX();
-                int explorerY = (int) explorer.getY();
-                g.translate(centerX - explorerX, centerY - explorerY);
-            }
-        }
+       
        
        
     }
